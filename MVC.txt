@@ -34,4 +34,64 @@ Controller <-> View (Django)
 15. После работы в приложении shop нам надо его зарегистрировать в файле settings.py в папке base в списке INSTALLED_APPS
 16. После того как мы создадим первые модели для базы данных нужно сделать для них миграцию, она делается коммандой python manage.py makemigrations
     после этой команды в папке migrations появится файл 0001. Ну я что бы применить миграции нужно прописать команду python manage.py migrate
+17. Если мы что то меняем в моделях то нужно опять создать миграцию и выполнить ее что бы наша база данных знала об изменениях
+    python manage.py makemigrations -> python manage.py migrate
+18. Для добавления данных в БД через терминал нужно сначала зайти в оболочку где нам будут доступны все пакеты python manage.py shell
+    Затем идет следующий код:
+    >>> from shop.models import Category, Course
+    >>> Course.objects.all()
+    <QuerySet []>
+    >>> new_category = Category(title='Programming') 
+    >>> new_category.save()
+    >>> Category.objects.all()
+    <QuerySet [<Category: Category object (1)>]>
+    >>> new_category.id
+    1
+    >>> new_category.title
+    'Programming'
+    >>> clear
+    Traceback (most recent call last):
+    File "<console>", line 1, in <module>
+    NameError: name 'clear' is not defined
+    >>> Category.objects.get(pk=1)
+    <Category: Category object (1)>
+    >>> Category.objects.get(pk=1).id
+    1
+    >>> Category.objects.filter(title='Programming') 
+    <QuerySet [<Category: Category object (1)>]> 
+19. Для добавления курсов в БД нам нужно написать следующий код:
+    category = Category.objects.get(id=1)
+    >>> category.course_set.all()
+    <QuerySet []>
+    >>> category.course_set.create(title="Complete Python guide", price=99.99, students_qty=100, reviews_qty=50) 
+    <Course: Course object (1)>
+    >>> Course.objects.all()
+    <QuerySet [<Course: Course object (1)>]>
+    >>> Course.objects.get(id=1)
+    <Course: Course object (1)>
+    >>> category.course_set.create(title="Complete Java guide", price=99.99, students_qty=80, reviews_qty=20)    
+    <Course: Course object (2)>
+    >>> Course.objects.all()
+    >>> print([(course.id, course.title, course.reviews_qty) for course in Course.objects.all()]) 
+    [(1, 'Complete Python guide', 50), (2, 'Complete Java guide', 20)]
 
+    Важно! Стоит помнить что курсы у нас привязаны к категориям и поэтому мы обращаемся к category.course_set
+    Для выхода из интерактивной оболочки нужно прописать quit()
+20. Для возможности взаимодействия с нашими моделями через админ панель нужно зарегистрировать их в файле admin.py:
+    from . import models
+    admin.site.register(models.Category)
+    admin.site.register(models.Course)
+21. Можно так же взаимодействовать с нашими моделями в модуле views.py предварительно импортировав их from .models import Course
+22. Для использования html шаблонов нам нужно в папке shop создать папку temlates и в ней мы можем создавать html файлы с нужным нам наполнением
+    Для того что бы использовать эти шаблоны мы в модуле views.py должны воспользоваться функцией render в которю передать первым аргументом 
+    request а вторым строку с названием нашего шаблона, python автоматически возьмет его из папки templates
+23. Мы так же можем использовать переменные в наших шаблонах, для этого в функции render третьим аргументом мы передаем контекст - это словарь
+    в котором мы и можем передать нужные данные. После этого в нашем тэмплейте в templates папке мы, с помощью определенного синтаксиса,
+    можем использовать переменные, проходиться по ним циклом и т д
+24. Мы имеем возможность встраивать 1 шаблон в другой. В папке temlates в файле base.html мы имеем базовую разметку с подключенной библиотекой 
+    bootstrap и в теге main мы будем использовать шаблон из файла courses.html, для этого в теге main прописан синтаксис {% block content %}
+    в данном случае content это просто название и в файле courses.html мы в самом начале даем знать что этот файл будет расширять файл base.html
+    командой {% extends 'base.html' %}, затем уже мы можем выбрать тот участок кода который мы хотим использовать в блоке content, пишем:
+    {% block content %}
+    ...(та разметка что мы используем)
+    {% endblock %}
