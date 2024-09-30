@@ -100,3 +100,42 @@ Controller <-> View (Django)
     Так же динамический url есть в функци single_course в модуле views.py
 26. Для удобной работы мы можем вынести папку templates в корень проекта, нужно не забыть вписать путь к этой папке в base/settings.py в блоке TEMPLATES
     в строке DIRS
+
+---------------------------------------------API-------------------------------------------------
+1. Мы создаем приложение api с помощью все той же команды python manage.py startapp api
+2. Мы будем работать с пакетом tastypie поэтому установим его pipenv install tastypie
+3. В файле api/models.py создадим наши модели для работы с курсами и категориями, как работать с библиотекой смотреть в доках
+4. Регистрируем наше приложение а так же библиотеку в base/settings.py -> INSTALLED_APPS
+5. Для возможности удаления с помощью REST-API нужно создать ApiKey, для этого выполняем все миграции python manage.py migrate
+   после чего в админ панели появится поле Tastypie - Api keys в нем и создаем ключ.
+   Так же (скорее в первую очередь) нам надо создать файл authentication.py в приложении api в котором будет следующий код:
+   from tastypie.authentication import ApiKeyAuthentication
+
+    class CustomAuthentication(ApiKeyAuthentication):
+    def is_authenticated(self, request, **kwargs):
+        if request.method == 'GET':
+            return True
+        
+        return super().is_authenticated(request, **kwargs)
+6. Ну и не забываем привязать пути для работы с нашим api, это делается в api/urls.py 
+   Там будет следующий код: 
+   from django.urls import path, include
+    from api.models import CourseResource, CategoryResource
+    from tastypie.api import Api
+
+    api = Api(api_name='v1')
+    course_resource = CourseResource()
+    category_resource = CategoryResource()
+    api.register(course_resource)
+    api.register(category_resource)
+
+    # api/v1/courses/       GET, POST
+    # api/v1/courses/1/     GET, DELETE
+    # api/v1/categories/    GET
+    # api/v1/categories/1/  GET
+
+    urlpatterns = [
+        path('', include(api.urls), name="index")
+    ]
+
+    И нужно не забыть зарегистрировать путь в base/urls.py

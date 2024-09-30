@@ -16,7 +16,13 @@
 </head>
 <body>
     <nav class="navbar navbar-dark bg-dark">
-        <div class="container"><a href={% url "shop:index" %} class="navbar-brand">Courses Shop</a></div>
+        <div class="container">
+            <a href={% url "shop:index" %} class="navbar-brand">Courses Shop</a>
+            <span class="navbar-text">
+                <a href="/admin/" class="me-2">Admin</a>
+                <a href="/api/v1/">Api</a>
+            </span>
+        </div>
     </nav>
     <main class"container">
         {% block content %}

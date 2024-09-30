@@ -16,7 +16,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("shop/", include('shop.urls')) # в include войдкт все пути из модуля urls в приложении shop
+    path("", include('shop.urls')), # в include войдкт все пути из модуля urls в приложении shop UPD: раньше это был путь "shop/"
+    path("api/", include('api.urls')),
 ]
