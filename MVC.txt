@@ -95,3 +95,8 @@ Controller <-> View (Django)
     {% block content %}
     ...(та разметка что мы используем)
     {% endblock %}
+25. Пример того как добавлять ссылки на страницы в проекте есть в courses.html {% url "single_course" course.id%} single_course указывается как 
+    name в модуле shop/urls.py
+    Так же динамический url есть в функци single_course в модуле views.py
+26. Для удобной работы мы можем вынести папку templates в корень проекта, нужно не забыть вписать путь к этой папке в base/settings.py в блоке TEMPLATES
+    в строке DIRS
